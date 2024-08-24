@@ -25,6 +25,7 @@ export const getUser = async (req: Request | any, res: Response) => {
     });
   }
 };
+
 export const signup = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
 
