@@ -8,17 +8,21 @@ dotenv.config();
 
 const app = express();
 
+// Middleware
 app.use(express.json());
 app.use(cors());
 
+// Route
 app.use("/tasks", taskRoute);
 app.use("/auth", authRoute);
 
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI!)
   .then(() => console.log("connected to mongoDB"))
   .catch((err) => console.error(err));
 
+// Server starten
 app.listen(process.env.PORT, () => {
   console.log("server is running on Port 8080...");
 });
