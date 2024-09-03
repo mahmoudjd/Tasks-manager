@@ -7,8 +7,10 @@ import MyButton from "../components/MyButton";
 interface Task {
   _id: string;
   name: string;
+  content: string;
   completed: boolean;
   createdAt: Date;
+  updatedAt: null | Date;
 }
 
 function AppTask() {
@@ -16,6 +18,7 @@ function AppTask() {
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [name, setName] = useState<string>("");
+  const [content, setContent] = useState<string>("");
   const [isShown, setIsShown] = useState<boolean>(false);
 
   useEffect(() => {
@@ -41,6 +44,60 @@ function AppTask() {
 
     fetchTasks();
   }, [token]);
+
+  const updateTask = async (
+    taskId: string,
+    name: string,
+    content: string,
+    completed: boolean,
+  ) => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/tasks/update-task/${taskId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name, content, completed }),
+        },
+      );
+
+      if (!response.ok) throw new Error("Failed to update task");
+
+      const data = await response.json();
+
+      setAllTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === taskId
+            ? {
+                ...task,
+                name: data.task.name,
+                content: data.task.content,
+                completed: data.task.completed,
+              }
+            : task,
+        ),
+      );
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === taskId
+            ? {
+                ...task,
+                name,
+                content,
+                completed,
+              }
+            : task,
+        ),
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const updateStatus = useCallback(
     async (taskId: string, completed: boolean) => {
@@ -91,13 +148,14 @@ function AppTask() {
           "Content-Type": "application/json",
           authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, completed: false }),
+        body: JSON.stringify({ name, content, completed: false }),
       });
 
       const newTask = await response.json();
       setAllTasks((prev) => [...prev, newTask.task]);
       setTasks((prev) => [...prev, newTask.task]);
       setName("");
+      setContent("");
       setIsShown(false);
     } catch (err) {
       console.error("Failed to add task:", err);
@@ -147,7 +205,13 @@ function AppTask() {
         handleClick={() => setIsShown((prev) => !prev)}
       />
       {isShown && (
-        <AddTask value={name} setValue={setName} onSubmit={addTask} />
+        <AddTask
+          name={name}
+          setName={setName}
+          content={content}
+          setContent={setContent}
+          onSubmit={addTask}
+        />
       )}
 
       <TaskFilter onFilter={filterTasks} />

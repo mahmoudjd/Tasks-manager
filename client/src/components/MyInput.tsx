@@ -13,7 +13,7 @@ const InputComponent = ({ type, placeholder, value, setValue }: Props) => {
       value={value}
       onChange={(e) => setValue(e.target.value)}
       required
-      className="w-full border-none shadow bg-slate-50 rounded px-2 py-4 text-lg"
+      className="w-full border-none shadow bg-slate-50 rounded px-2 py-4 mb-2 text-lg"
     />
   );
 };

@@ -4,8 +4,10 @@ import TaskItem from "./TaskItem";
 interface Task {
   _id: string;
   name: string;
+  content: string;
   completed: boolean;
   createdAt: Date;
+  updatedAt: Date | null;
 }
 
 interface TaskListProps {
@@ -25,8 +27,10 @@ const TaskList: React.FC<TaskListProps> = ({
         <TaskItem
           key={task._id}
           name={task.name}
+          content={task.content}
           id={task._id}
           createdAt={task.createdAt}
+          updatedAt={task.updatedAt}
           completed={task.completed}
           onDelete={onDelete}
           onStatusChange={onStatusChange}

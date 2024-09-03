@@ -26,11 +26,12 @@ export const getTasks = async (req: Request | any, res: Response) => {
 };
 
 export const createTask = async (req: Request | any, res: Response) => {
-  const { name, completed } = req.body;
+  const { name, content, completed } = req.body;
   const { user } = req.user;
   try {
     const task = await Task.create({
       name,
+      content,
       completed,
       userId: user._id,
     });
@@ -54,20 +55,22 @@ export const createTask = async (req: Request | any, res: Response) => {
   }
 };
 
-export const statusUpdate = async (req: Request, res: Response) => {
-  const { completed } = req.body;
+export const updateTask = async (req: Request, res: Response) => {
+  const { name, content, completed } = req.body;
   const { id } = req.params;
   try {
+    const updatedAt = Date.now();
+
     const task = await Task.findOneAndUpdate(
       { _id: id },
-      { $set: { completed } },
+      { $set: { name, content, completed, updatedAt } },
     );
 
     if (!task) {
       return res.status(404).json({ error: true, messsage: "not found task" });
     }
 
-    return res.status(202).json({
+    return res.status(200).json({
       error: false,
       task,
       message: "status updated successfully",
@@ -80,6 +83,33 @@ export const statusUpdate = async (req: Request, res: Response) => {
   }
 };
 
+export const updateStatus = async (req: Request, res: Response) => {
+  const { completed } = req.body;
+  const { id } = req.params;
+  try {
+    const updatedAt = Date.now();
+
+    const task = await Task.findOneAndUpdate(
+      { _id: id },
+      { $set: { completed, updatedAt } },
+    );
+
+    if (!task) {
+      return res.status(404).json({ error: true, messsage: "not found task" });
+    }
+
+    return res.status(200).json({
+      error: false,
+      task,
+      message: "status updated successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "internal server errror",
+    });
+  }
+};
 export const deleteTask = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -90,7 +120,7 @@ export const deleteTask = async (req: Request, res: Response) => {
         message: "not found task",
       });
     }
-    return res.status(203).json({
+    return res.status(200).json({
       error: false,
       message: "task deleted successfully",
     });

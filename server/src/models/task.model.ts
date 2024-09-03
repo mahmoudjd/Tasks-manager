@@ -7,6 +7,9 @@ const TaskSchema = new Schema({
     type: String,
     required: true,
   },
+  content: {
+    type: String,
+  },
   completed: {
     type: Boolean,
     default: false,
@@ -14,6 +17,9 @@ const TaskSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+  },
+  updatedAt: {
+    type: Date,
   },
   userId: {
     type: String,
